@@ -107,7 +107,9 @@ function UploadFile({ type }: UploadFileProps) {
         <Button className='size-12 rounded-xl'>
           <X />
         </Button>
-        <Button className='w-full h-12 rounded-xl'>Upload Image</Button>
+        <Button className='w-full h-12 rounded-xl' type='submit'>
+          Upload Image
+        </Button>
       </div>
     </form>
   );
