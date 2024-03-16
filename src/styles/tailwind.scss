@@ -85,10 +85,10 @@
 	}
 
 	body {
-		@apply bg-background text-foreground;
+		@apply bg-muted text-foreground;
 	}
 
-	h4 {
-		@apply scroll-m-20 text-xl font-semibold tracking-tight;
+	h3 {
+		@apply scroll-m-20 text-2xl font-semibold tracking-tight;
 	}
 }
