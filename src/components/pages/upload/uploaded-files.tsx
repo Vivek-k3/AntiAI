@@ -168,7 +168,7 @@ function UploadedFilePreview({ route, content, predict, probability, status }: U
         </div>
       );
   }
-
+  console.log("i am here",predict)
   return (
     <div className='flex items-center justify-start gap-5 first:pt-0 pt-5'>
       <div>
@@ -188,7 +188,7 @@ function UploadedFilePreview({ route, content, predict, probability, status }: U
         ) : (
           <div className='text-sm text-muted-foreground font-medium'>
             <p>
-              Predict: <span className='font-semibold text-foreground'>{predict}</span>
+              Predict: <span className='font-semibold text-foreground'>{predict ? 'AI Generated' : 'Human Generated'}</span>
             </p>
             <p>Probability: {probability}</p>
           </div>
