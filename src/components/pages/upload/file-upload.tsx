@@ -3,9 +3,12 @@
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils/cn';
+import { supabase } from '@/lib/utils/db';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { Fragment, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from 'react';
+
+const apiURL = 'http://localhost:7002/';
 
 export function Files() {
   return (
@@ -83,10 +86,38 @@ function UploadFile({ type }: UploadFileProps) {
     updateFiles(inputFiles);
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    console.log('Selected file: ', file);
+    if (!file) {
+      console.error('No file selected.');
+      return;
+    }
+    try {
+      const name = Math.random().toString(36).substring(7);
+      const { data, error } = await supabase.storage.from('ai-detector-blob').upload(name, file);
+
+      if (error) {
+        console.error('Error uploading file:', error.message);
+        return;
+      }
+      const supabaseResponse = await fetch(`${apiURL}${type}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: data.path }),
+      });
+      if (!supabaseResponse.ok) {
+        const errorMessage = await supabaseResponse.text();
+        console.error('Error sending content to the route:', errorMessage);
+        return;
+      }
+      console.log('Content sent to the route successfully:', data.path);
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    } catch (error: any) {
+      console.error('Error uploading file:', (error as Error).message);
+    }
   }
 
   function PreviewFile() {
@@ -165,9 +196,18 @@ function UploadFile({ type }: UploadFileProps) {
 function TextInput() {
   const [text, setText] = useState('');
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    const response = await fetch(`${apiURL}text`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content: text }),
+    });
+    // Handle response
+    // console.log("Text submission response:", await response.json());
+    setText('');
     console.log('Selected file: ', text);
   }
 
