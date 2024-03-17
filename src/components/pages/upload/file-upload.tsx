@@ -28,7 +28,7 @@ export function Files() {
           <UploadFile type='image' />
         </TabsContent>
         <TabsContent value='text' className='mt-3'>
-          Change your password here.
+          <TextInput />
         </TabsContent>
         <TabsContent value='audio' className='mt-3'>
           <UploadFile type='audio' />
@@ -107,8 +107,37 @@ function UploadFile({ type }: UploadFileProps) {
         <Button className='size-12 rounded-xl'>
           <X />
         </Button>
-        <Button className='w-full h-12 rounded-xl' type='submit'>
-          Upload Image
+        <Button className='w-full h-12 rounded-xl capitalize' type='submit'>
+          Upload {type}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function TextInput() {
+  const [text, setText] = useState('');
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    console.log('Selected file: ', text);
+  }
+
+  return (
+    <form className='mx-3' onSubmit={handleSubmit}>
+      <textarea
+        className={cn('border-2 relative z-50 hover:cursor-pointer rounded-xl h-64 inline-block w-full resize-none p-4 bg-muted')}
+        placeholder='Type your message'
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <div className='pt-3 flex items-center justify-between gap-3'>
+        <Button className='size-12 rounded-xl' disabled={text.length === 0}>
+          <X />
+        </Button>
+        <Button className='w-full h-12 rounded-xl' type='submit' disabled={text.length === 0}>
+          Vefiry Text
         </Button>
       </div>
     </form>
