@@ -8,7 +8,7 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { Fragment, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from 'react';
 
-const apiURL = 'http://localhost:7002/';
+const apiURL = 'https://urchin-app-9qtyt.ondigitalocean.app/';
 
 export function Files() {
   return (
@@ -118,6 +118,8 @@ function UploadFile({ type }: UploadFileProps) {
     } catch (error: any) {
       console.error('Error uploading file:', (error as Error).message);
     }
+    setFile(null);
+    setPreview({ status: false, url: '' });
   }
 
   function PreviewFile() {
@@ -232,7 +234,7 @@ function TextInput() {
           <X />
         </Button>
         <Button className='w-full h-12 rounded-xl bg-primary-color text-background' type='submit' disabled={text.length === 0}>
-          Vefiry Text
+          Verify Text
         </Button>
       </div>
     </form>

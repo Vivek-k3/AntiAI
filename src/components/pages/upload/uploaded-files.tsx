@@ -3,9 +3,9 @@
 import { supabase } from '@/lib/utils/db';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-// import VideoThumbnail from 'react-video-thumbnail';
 
-type UploadedFileCard = { route: 'image' | 'text' | 'audio' | 'video'; content: string; request_id: string } & (
+type UploadedFileCard = { route: 'image' | 'text' | 'audio' | 'video'; content: string; request_id: string; created_at: number } & (
+  
   | {
       status: 'PENDING';
       predict: null;
@@ -18,39 +18,41 @@ type UploadedFileCard = { route: 'image' | 'text' | 'audio' | 'video'; content: 
     }
 );
 
-const UPLOADED_FILES: UploadedFileCard[] = [
-  {
-    request_id: '123456',
-    route: 'text',
-    content: 'Some random Content',
-    status: 'PENDING',
-    predict: null,
-    probability: null,
-  },
-  {
-    request_id: '123454',
-    route: 'image',
-    content: '/ui/demo-pic.jpg',
-    status: 'PENDING',
-    predict: null,
-    probability: null,
-  },
-  {
-    request_id: '123458',
-    route: 'text',
-    content: '/ui/demo-pic.jpg',
-    status: 'APPROVED',
-    predict: 'AI Generated',
-    probability: 99.31,
-  },
-];
+// const UPLOADED_FILES: UploadedFileCard[] = [
+//   {
+//     request_id: '123456',
+//     route: 'text',
+//     content: 'Some random Content',
+//     status: 'PENDING',
+//     predict: null,
+//     probability: null,
+
+//   },
+//   {
+//     request_id: '123454',
+//     route: 'image',
+//     content: '/ui/demo-pic.jpg',
+//     status: 'PENDING',
+//     predict: null,
+//     probability: null,
+//   },
+//   {
+//     request_id: '123458',
+//     route: 'text',
+//     content: '/ui/demo-pic.jpg',
+//     status: 'APPROVED',
+//     predict: 'AI Generated',
+//     probability: 99.31,
+//   },
+// ];
 
 export function UploadedFiles() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFileCard[]>([]);
-
+  const [isModalOpen , setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<UploadedFileCard | null>(null);
   useEffect(() => {
     const fetchUploadedFiles = async () => {
-      const { data, error } = await supabase.from('queue').select('*');
+      const { data, error } = await supabase.from('queue').select('*').order('created_at', { ascending: false }); ;
       if (error) {
         console.error('Error fetching uploaded files:', error.message);
         return;
@@ -96,12 +98,29 @@ export function UploadedFiles() {
     };
   }, []);
   console.log(uploadedFiles);
+  const openModal = (file: UploadedFileCard) => {
+    setSelectedFile(file);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedFile(null);
+    setIsModalOpen(false);
+  };
   return (
     <div className='bg-background rounded-2xl my-4 p-5 max-w-[400px] mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
       {uploadedFiles.map((val, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-        <UploadedFilePreview key={index} {...val} />
+        <div key={index} className='cursor-pointer'>
+          <UploadedFilePreview {...val} />
+        </div>
       ))}
+       {isModalOpen  && (
+        <Modal onClose={()=> closeModal()}>
+          {/* <ModalPreview {...selectedFile} /> */}
+          <h1></h1>
+        </Modal>
+      )}
     </div>
   );
 }
@@ -135,12 +154,17 @@ function UploadedFilePreview({ route, content, predict, probability, status }: U
       return (
         <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
           <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+          {/* <audio src={content} />
+            {/* <track kind='captions' />
+          </audio>    */} 
+
         </div>
       );
     if (route === 'video')
       return (
         <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
-          <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+          {/* <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized /> */}
+          <video src={content} className='w-full inline-block h-12 rounded-lg' width={100} height={100}  />      
         </div>
       );
   }
@@ -152,6 +176,11 @@ function UploadedFilePreview({ route, content, predict, probability, status }: U
       </div>
       <div className=''>
         <p className='uppercase text-muted-foreground text-xs font-medium'>{route}</p>
+        {route == 'text' &&(
+          <div className='text-sm text-muted-foreground font-medium'>
+            Content: {content.length > 100 ? content.substring(0, 20) + '...' : content}
+          </div>
+        )}
         {status === 'PENDING' ? (
           <div>
             <p className='text-primary-color font-medium text-sm'>Loading...</p>
@@ -165,6 +194,64 @@ function UploadedFilePreview({ route, content, predict, probability, status }: U
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+
+function ModalPreview({ route, content, predict, probability, status }: UploadedFileCard) {
+  function PreviewFile() {
+    if (route === 'image')
+      return (
+        <div className='overflow-hidden border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={content} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+        </div>
+      );
+    if (route === 'text')
+      return (
+        <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+        </div>
+      );
+    if (route === 'audio')
+      return (
+        <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+          {/* <audio src={content} />
+            {/* <track kind='captions' />
+          </audio>    */} 
+
+        </div>
+      );
+    if (route === 'video')
+      return (
+        <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          {/* <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized /> */}
+          <video src={content} className='w-full inline-block h-12 rounded-lg' width={100} height={100}  />      
+        </div>
+      );
+  }
+
+  return(
+    <div className='bg-white rounded-2xl my-4 p-5 w-[400px] h-[400px] mx-auto'>
+      <h1>{route}</h1>
+      <PreviewFile/>
+
+    </div>
+  )
+
+}
+
+interface ModalProps {
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+function Modal({ onClose, children }: ModalProps) {
+  return (
+    <div className='fixed top-0 left-0 w-full h-full flex items-left justify-left bg-black bg-opacity-50'>
+      <div >{children}</div>
+      <div className='fixed top-0 left-0 w-full h-full cursor-pointer' onClick={onClose}></div>
     </div>
   );
 }
