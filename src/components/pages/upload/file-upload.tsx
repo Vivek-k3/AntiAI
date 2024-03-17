@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils/cn';
 import { X } from 'lucide-react';
-import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from 'react';
+import Image from 'next/image';
+import { Fragment, useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from 'react';
 
 export function Files() {
   return (
@@ -64,9 +65,8 @@ function UploadFile({ type }: UploadFileProps) {
 
     const blobUrl = URL.createObjectURL(inputFiles[0]);
 
-    setPreview({ status: true, url: blobUrl });
-
     setFile(inputFiles[0]);
+    setPreview({ status: true, url: blobUrl });
   }
 
   function dragPreventDefault(e: DragEvent<HTMLFormElement>) {
@@ -89,6 +89,41 @@ function UploadFile({ type }: UploadFileProps) {
     console.log('Selected file: ', file);
   }
 
+  function PreviewFile() {
+    if (file === null)
+      return (
+        <Fragment>
+          <Cloud />
+          <p className='text-xs font-medium'>You can drag or upload the image</p>
+        </Fragment>
+      );
+
+    if (type === 'image')
+      return (
+        <div className='overflow-hidden w-full rounded-xl'>
+          <Image src={preview.url} className='w-full inline-block h-auto rounded-xl' width={100} height={100} alt={file.name} unoptimized />
+        </div>
+      );
+
+    if (type === 'audio')
+      return (
+        <div>
+          <audio src={preview.url} controls>
+            <track kind='captions' />
+          </audio>
+        </div>
+      );
+
+    if (type === 'video')
+      return (
+        <div>
+          <video src={preview.url} controls>
+            <track kind='captions' />
+          </video>
+        </div>
+      );
+  }
+
   return (
     <form
       className='mx-3'
@@ -104,8 +139,7 @@ function UploadFile({ type }: UploadFileProps) {
         )}
         onClick={() => inputRef.current?.click()}
       >
-        <Cloud />
-        <p className='text-xs font-medium'>You can drag or upload the image</p>
+        <PreviewFile />
       </div>
       <input ref={inputRef} className='hidden' type='file' accept={`${type}/*`} multiple={false} onChange={handleChange} />
       <div className='pt-3 flex items-center justify-between gap-3'>
