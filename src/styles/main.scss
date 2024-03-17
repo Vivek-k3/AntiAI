@@ -1,1 +1,11 @@
 @forward "tailwind.scss";
+
+@keyframes blink {
+    0% { background-color: #ff6347; } /* Adjust the color as needed */
+    50% { background-color: #730ce2; } /* Adjust the color as needed */
+    100% { background-color: #ff6347; } /* Adjust the color as needed */
+  }
+  
+  .blink-animation {
+    animation: blink 1s infinite;
+  }

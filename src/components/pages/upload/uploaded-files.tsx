@@ -52,7 +52,7 @@ export function UploadedFiles() {
   const [selectedFile, setSelectedFile] = useState<UploadedFileCard | null>(null);
   useEffect(() => {
     const fetchUploadedFiles = async () => {
-      const { data, error } = await supabase.from('queue').select('*').order('created_at', { ascending: false }); ;
+      const { data, error } = await supabase.from('queue').select('*').order('created_at', { ascending: false }).range(0,9) ;
       if (error) {
         console.error('Error fetching uploaded files:', error.message);
         return;
@@ -72,16 +72,26 @@ export function UploadedFiles() {
 
     // Create a function to handle updates
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // const handleUpdates = (payload: any) => {
+    //   console.log('File updated:', payload.new);
+    //   setUploadedFiles((prevFiles) => {
+    //     const updatedFileIndex = prevFiles.findIndex((file) => file.request_id === payload.new.id);
+    //     console.log("updatedfileindex",updatedFileIndex)
+    //     if (updatedFileIndex !== -1) {
+    //       const updatedFiles = [...prevFiles];
+    //       updatedFiles[updatedFileIndex] = payload.new;
+    //       return updatedFiles;
+    //     }
+    //     return prevFiles;
+    //   });
+    // };
     const handleUpdates = (payload: any) => {
       console.log('File updated:', payload.new);
       setUploadedFiles((prevFiles) => {
-        const updatedFileIndex = prevFiles.findIndex((file) => file.request_id === payload.new.id);
-        if (updatedFileIndex !== -1) {
-          const updatedFiles = [...prevFiles];
-          updatedFiles[updatedFileIndex] = payload.new;
-          return updatedFiles;
-        }
-        return prevFiles;
+        const updatedFiles = prevFiles.map((file) => 
+          file.request_id === payload.new.id ? payload.new : file
+        );
+        return updatedFiles;
       });
     };
 
@@ -91,6 +101,8 @@ export function UploadedFiles() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'queue' }, handleInserts)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'queue' }, handleUpdates)
       .subscribe();
+
+    
 
     // Cleanup subscription on unmount
     return () => {
@@ -108,10 +120,13 @@ export function UploadedFiles() {
     setIsModalOpen(false);
   };
   return (
-    <div className='bg-background rounded-2xl my-4 p-5 max-w-[400px] mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
+    
+    <div className='bg-background rounded-2xl my-4 p-5 min-w-[300px]  max-w-[400px] max-h-[900px]  mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
+      <p className='text-2xl font-medium'>Request Queue...</p>
+      
       {uploadedFiles.map((val, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-        <div key={index} className='cursor-pointer'>
+        <div key={index}  className='cursor-pointer pt-2'>
           <UploadedFilePreview {...val} />
         </div>
       ))}
@@ -168,7 +183,7 @@ function UploadedFilePreview({ route, content, predict, probability, status }: U
         </div>
       );
   }
-  console.log("i am here",predict)
+  
   return (
     <div className='flex items-center justify-start gap-5 first:pt-0 pt-5'>
       <div>

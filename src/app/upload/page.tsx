@@ -8,13 +8,17 @@ export default function Page() {
     <Fragment>
       <Header />
       <main>
-        <section>
-          <div className='text-center py-4'>
-            <h3>Detect AI-Generated or Real Content</h3>
-            <p className='text-muted-foreground text-sm py-2'>Advanced AI Verification for Video, Text, Image, and Audio Files</p>
+        <section style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
+          <div>
+            <div className='text-center py-4'>
+              <h3>Detect AI-Generated or Real Content</h3>
+              <p className='text-muted-foreground text-sm py-2'>Advanced AI Verification for Video, Text, Image, and Audio Files</p>
+            </div>
+            <Files />
           </div>
-          <Files />
-          <UploadedFiles />
+          <div style={{ marginRight: '80px' }}>
+            <UploadedFiles />
+          </div>
         </section>
       </main>
     </Fragment>

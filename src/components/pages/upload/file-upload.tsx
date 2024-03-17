@@ -53,6 +53,7 @@ function UploadFile({ type }: UploadFileProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState({ status: true, url: '' });
   const inputRef = useRef<HTMLInputElement>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   function updateFiles(inputFiles: FileList | null) {
     if (!inputFiles) {
@@ -88,7 +89,7 @@ function UploadFile({ type }: UploadFileProps) {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    setSubmitting(true)
     if (!file) {
       console.error('No file selected.');
       return;
@@ -118,6 +119,7 @@ function UploadFile({ type }: UploadFileProps) {
     } catch (error: any) {
       console.error('Error uploading file:', (error as Error).message);
     }
+    setSubmitting(false)
     setFile(null);
     setPreview({ status: false, url: '' });
   }
@@ -187,9 +189,13 @@ function UploadFile({ type }: UploadFileProps) {
         >
           <X />
         </Button>
-        <Button className='w-full h-12 rounded-xl capitalize  bg-primary-color text-background' type='submit'>
-          Upload {type}
-        </Button>
+        <Button
+  className={`w-full h-12 rounded-xl capitalize bg-primary-color text-background ${submitting ? 'blink-animation cursor-not-allowed'  : ''}`}
+  type='submit'
+  disabled={submitting}
+>
+  {submitting ? 'Uploading...' : `Upload ${type}`}
+</Button>
       </div>
     </form>
   );
