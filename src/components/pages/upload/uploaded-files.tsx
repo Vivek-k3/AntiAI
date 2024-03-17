@@ -66,7 +66,6 @@ export function UploadedFiles() {
     // Create a function to handle inserts
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const handleInserts = (payload: any) => {
-      console.log('New file inserted:', payload.new);
       setUploadedFiles((prevFiles) => [payload.new, ...prevFiles]);
     };
 
@@ -86,7 +85,7 @@ export function UploadedFiles() {
     //   });
     // };
     const handleUpdates = (payload: any) => {
-      console.log('File updated:', payload.new);
+      
       setUploadedFiles((prevFiles) => {
         const updatedFiles = prevFiles.map((file) => 
           file.request_id === payload.new.id ? payload.new : file
@@ -108,8 +107,7 @@ export function UploadedFiles() {
     return () => {
       // supabase.unsubscribe(subscription);
     };
-  }, []);
-  console.log(uploadedFiles);
+  }, [uploadedFiles]);
   const openModal = (file: UploadedFileCard) => {
     setSelectedFile(file);
     setIsModalOpen(true);
@@ -124,7 +122,7 @@ export function UploadedFiles() {
     <div className='bg-background rounded-2xl my-4 p-5 min-w-[300px]  max-w-[400px] max-h-[900px]  mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
       <p className='text-2xl font-medium'>Request Queue...</p>
       
-      {uploadedFiles.map((val, index) => (
+      {uploadedFiles.slice(-10).map((val, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
         <div key={index}  className='cursor-pointer pt-2'>
           <UploadedFilePreview {...val} />
