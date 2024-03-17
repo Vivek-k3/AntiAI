@@ -38,6 +38,9 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
+  react-video-thumbnail:
+    specifier: ^0.1.3
+    version: 0.1.3
   tailwind-merge:
     specifier: ^2.2.1
     version: 2.2.1
@@ -1432,6 +1435,10 @@ packages:
       invariant: 2.2.4
       react: 18.2.0
       tslib: 2.6.2
+    dev: false
+
+  /react-video-thumbnail@0.1.3:
+    resolution: {integrity: sha512-ZakEVv9RNFcziAnHHtwod5tf0yMVv4aLZ8/QsCxt1HTnKRHrlylvolPKv1hr63GCwnPu6tgPjUTDKRqfl30lOQ==}
     dev: false
 
   /react@18.2.0:

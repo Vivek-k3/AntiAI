@@ -1,10 +1,11 @@
-"use client"
+'use client';
+
+import { supabase } from '@/lib/utils/db';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { supabase } from "@/lib/utils/db";
+// import VideoThumbnail from 'react-video-thumbnail';
 
-
-
-type UploadedFileCard = { route: 'image' | 'text' | 'audio' | 'video'; content: string; request_id : string } & (
+type UploadedFileCard = { route: 'image' | 'text' | 'audio' | 'video'; content: string; request_id: string } & (
   | {
       status: 'PENDING';
       predict: null;
@@ -19,7 +20,7 @@ type UploadedFileCard = { route: 'image' | 'text' | 'audio' | 'video'; content: 
 
 const UPLOADED_FILES: UploadedFileCard[] = [
   {
-    request_id:'123456',
+    request_id: '123456',
     route: 'text',
     content: 'Some random Content',
     status: 'PENDING',
@@ -27,7 +28,7 @@ const UPLOADED_FILES: UploadedFileCard[] = [
     probability: null,
   },
   {
-    request_id:'123454',
+    request_id: '123454',
     route: 'image',
     content: '/ui/demo-pic.jpg',
     status: 'PENDING',
@@ -35,7 +36,7 @@ const UPLOADED_FILES: UploadedFileCard[] = [
     probability: null,
   },
   {
-    request_id:'123458',
+    request_id: '123458',
     route: 'text',
     content: '/ui/demo-pic.jpg',
     status: 'APPROVED',
@@ -44,7 +45,7 @@ const UPLOADED_FILES: UploadedFileCard[] = [
   },
 ];
 
-export function UploadedFiles(){
+export function UploadedFiles() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFileCard[]>([]);
 
   useEffect(() => {
@@ -61,16 +62,18 @@ export function UploadedFiles(){
     fetchUploadedFiles();
 
     // Create a function to handle inserts
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const handleInserts = (payload: any) => {
-      console.log('New file inserted:', payload.new)
-      setUploadedFiles(prevFiles => [payload.new, ...prevFiles]);
+      console.log('New file inserted:', payload.new);
+      setUploadedFiles((prevFiles) => [payload.new, ...prevFiles]);
     };
 
     // Create a function to handle updates
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const handleUpdates = (payload: any) => {
-      console.log('File updated:', payload.new)
-      setUploadedFiles(prevFiles => {
-        const updatedFileIndex = prevFiles.findIndex(file => file.request_id === payload.new.id);
+      console.log('File updated:', payload.new);
+      setUploadedFiles((prevFiles) => {
+        const updatedFileIndex = prevFiles.findIndex((file) => file.request_id === payload.new.id);
         if (updatedFileIndex !== -1) {
           const updatedFiles = [...prevFiles];
           updatedFiles[updatedFileIndex] = payload.new;
@@ -92,16 +95,16 @@ export function UploadedFiles(){
       // supabase.unsubscribe(subscription);
     };
   }, []);
-  console.log(uploadedFiles)
+  console.log(uploadedFiles);
   return (
     <div className='bg-background rounded-2xl my-4 p-5 max-w-[400px] mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
       {uploadedFiles.map((val, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
         <UploadedFilePreview key={index} {...val} />
       ))}
     </div>
   );
 }
-
 
 // export function UploadedFiles() {
 //   return (
@@ -115,9 +118,38 @@ export function UploadedFiles(){
 // }
 
 function UploadedFilePreview({ route, content, predict, probability, status }: UploadedFileCard) {
+  function PreviewFile() {
+    if (route === 'image')
+      return (
+        <div className='overflow-hidden border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={content} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+        </div>
+      );
+    if (route === 'text')
+      return (
+        <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+        </div>
+      );
+    if (route === 'audio')
+      return (
+        <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+        </div>
+      );
+    if (route === 'video')
+      return (
+        <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>
+          <Image src={'/ui/test-pic.jpg'} className='w-full inline-block h-12 rounded-lg' width={100} height={100} alt={'preview'} unoptimized />
+        </div>
+      );
+  }
+
   return (
     <div className='flex items-center justify-start gap-5 first:pt-0 pt-5'>
-      <div className='border border-primary-color rounded-lg w-16 h-12 flex items-center justify-center'>image</div>
+      <div>
+        <PreviewFile />
+      </div>
       <div className=''>
         <p className='uppercase text-muted-foreground text-xs font-medium'>{route}</p>
         {status === 'PENDING' ? (
