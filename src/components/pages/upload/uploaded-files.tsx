@@ -119,12 +119,12 @@ export function UploadedFiles() {
   };
   return (
     
-    <div className='bg-background rounded-2xl my-4 p-5 min-w-[300px]  max-w-[400px] max-h-[900px]  mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
-      <p className='text-2xl font-medium'>Request Queue...</p>
+    <div className='bg-background rounded-2xl my-4 p-6 min-w-[600px]  max-w-[700px] max-h-[1000px]  mx-auto divide-y-2 divide-gray-300 space-y-5 shadow-[0px_4px_24px_0px_hsla(0,0%,0%,0.1)]'>
+      <p className='text-2xl font-bold'>Deepfake Analysis Results...</p>
       
       {uploadedFiles.slice(-10).map((val, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-        <div key={index}  className='cursor-pointer pt-2'>
+        <div key={index}  className='cursor-pointer pt-4'>
           <UploadedFilePreview {...val} />
         </div>
       ))}
